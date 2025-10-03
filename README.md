@@ -30,9 +30,5 @@ Processed files are deposited in zenodo: **10.5281/zenodo.17258163**
 -   scATAC-seq QC, clustering, plotting, peaks, motifs: **ArchR v1.0.2**
 -   Gene Regulatory Network inference: **SCENIC+ v1.0a1**
 
-<sub>For more details on our methodology, see our manuscript ....
-------------------------------------------------------------------------
+<sub>For more details on our methodology, see our manuscript
 
-## Citation
-
-If you use this dataset, please cite the associated manuscript:.............
