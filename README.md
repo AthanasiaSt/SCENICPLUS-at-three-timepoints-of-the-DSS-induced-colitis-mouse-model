@@ -13,7 +13,7 @@ In-house raw data from this work are deposited in GEO with the following accessi
   - Homeostasis, acute inflammation, regeneration: GSE304192
 
 
-Processed files are deposited in zenodo: **10.5281/zenodo.17258163**
+Processed files are deposited in zenodo: **https://doi.org/10.5281/zenodo.17988836**
 
 ## Methods Summary
 
