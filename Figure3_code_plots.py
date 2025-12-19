@@ -14,12 +14,12 @@ import numpy as np
 import seaborn as sns
 
 
-# find enrichment of D0 marker gene sets in the regulons
+# find enrichment of Healthy marker gene sets in the regulons
 #marker genes D0-specific , see supplementary data 2 in the manuscript
-markers=pd.read_excel('Supplementary Data 2.xlsx',  sheet_name='D0_MarkerGenes')
+markers=pd.read_excel('Supplementary Data 2.xlsx',  sheet_name='Healthy_MarkerGenes')
 
 #filtered positive regulons // uploaded in zenodo processed files 
-regulons_df=pd.read_csv('/SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', sep='\t')
+regulons_df=pd.read_csv('./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', sep='\t')
 
 # ---------------------------------filtering marker genes based on log2FC and percentage of cells 
 # Filter markers based on effect size and percentage threshold
@@ -82,7 +82,7 @@ matrix[np.isnan(matrix)] = 0  # replace NaNs with 0
 # Reorder rows and columns manually 
 # -------------------------------------------------------------------------
 d = pd.DataFrame(matrix).reindex(
-    index=['D0_Trophocytes','D0_PDGFRalo','D0_Telocytes'], 
+    index=['Healthy_Trophocytes','Healthy_CD81-stroma','Healthy_SEMFs'], 
     columns=['Ar', 'Ebf1', 'Klf4', 'Klf2','Hoxb4', 'Ebf3', 'Egr1', 'Pbx1',
              'Nfix','Tcf7l2', 'Egr3', 'Maf', 'Tcf21', 'Frem1', 'Pitx1',
              'Stat5b', 'Foxf2', 'Tcf4', 'Runx1', 'Runx2', 'Batf','Foxf1','Etv1']

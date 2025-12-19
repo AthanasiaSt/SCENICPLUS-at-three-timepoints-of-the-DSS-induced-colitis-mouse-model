@@ -16,7 +16,7 @@ setwd(paste0(var,'/Processed_datasets_for_scRNA_scATAC_scenicplus/'))
 
 
 #filtered regulons, can be found in zenodo
-regulons_df<-read.table('/SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
+regulons_df<-read.table('/SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
 
 # keep unique combinations
 pos_regulons_filter_df <- regulons_df[!duplicated(regulons_df[c("TF", "Gene")]), ]

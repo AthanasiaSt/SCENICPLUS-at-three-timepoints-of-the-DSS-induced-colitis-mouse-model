@@ -14,8 +14,8 @@ import numpy as np
 import seaborn as sns
 
 #-------------------------------------- Load DEGs for D7 and D14 --- see supplementary data 5 in the manuscript
-D7_DEGs = pd.read_excel('Supplementary Data 5.xlsx', sheet_name='D7k_vs_D0k_upDEGs_subtypeLevel')
-D14_DEGs = pd.read_excel('Supplementary Data 5.xlsx', sheet_name='D14_vs_D0_upDEGs_subtypeLevel')
+D7_DEGs = pd.read_excel('Supplementary Data 5.xlsx', sheet_name='InflammationK_vs_HealthyK_upDEGs_subtypeLevel')
+D14_DEGs = pd.read_excel('Supplementary Data 5.xlsx', sheet_name='Regeneration_vs_Healthy_upDEGs_subtypeLevel')
 
 
 #-------------------------------------- Filter DEGs for strong upregulation (log2FC >= 1)
@@ -30,7 +30,7 @@ D14_DEGs['TF'] = D14_DEGs['genes'].copy()
 
 #-------------------------------------- Load filtered positive regulons, find in zenodo
 regulons_df = pd.read_csv(
-    '/SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv',
+    './SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv',
     sep='\t'
 )
 
@@ -76,8 +76,8 @@ TFs_d7 = df_d7['TF'].unique()
 TFs_d14 = df_d14['TF'].unique()
 
 #-------------------------------------- Filter so as TFs are upregulated themselves (log2FC >= 0.58) in at least one category
-D7_DEGs = pd.read_excel('Supplementary Data 5.xlsx', sheet_name='D7k_vs_D0k_upDEGs_subtypeLevel')
-D14_DEGs = pd.read_excel('Supplementary Data 5.xlsx', sheet_name='D14_vs_D0_upDEGs_subtypeLevel')
+D7_DEGs = pd.read_excel('Supplementary Data 5.xlsx', sheet_name='InflammationK_vs_HealthyK_upDEGs_subtypeLevel')
+D14_DEGs = pd.read_excel('Supplementary Data 5.xlsx', sheet_name='Regeneration_vs_Healthy_upDEGs_subtypeLevel')
 
 D7_DEGs = D7_DEGs[D7_DEGs['avg_log2FC'] >= 0.58]
 D7_DEGs['Gene'] = D7_DEGs['genes'].copy()

@@ -14,27 +14,27 @@ library(ArchR)
 var<-getwd() 
 setwd(paste0(var,'/Processed_datasets_for_scRNA_scATAC_scenicplus/'))
 
-# loading the scRNA-seq object with the Harmony integration of D0, D7, D14 fibroblasts
-seurat_obj<-readRDS(file = "/scRNA_seurat_integration_D0_D7_D14/Seurat5_Harmony_integration_all_samples_D0_D7_D14_fibroblasts.rds")
+# loading the scRNA-seq object with the Harmony integration of D0, D7, Regeneration fibroblasts
+seurat_obj<-readRDS(file = "./scRNA_seurat_integration_Healthy_Inflammation_Regeneration/Seurat5_Harmony_integration_all_samples_Healthy_Inflammation_Regeneration_fibroblasts.rds")
 
 # colours  
-colours_conditions = c('D0'='#569B9A','D0_kinchen'="#A1CEC5",'D7_kinchen'='#8e0f62','D14'='#CD5808')
-colours_celltypes = c('Trophocytes'="#8E7692",'PDGFRalo'='#a5af37','Telocytes'='#416522')
+colours_conditions = c('Healthy'='#569B9A','HealthyK'="#A1CEC5",'InflammationK'='#8e0f62','Regeneration'='#CD5808')
+colours_celltypes = c('Trophocytes'="#8E7692",'CD81-stroma'='#a5af37','SEMFs'='#416522')
 
 
 #-----------------------------Figure 5.b
-#keep only D7, D14
-seurat_obj<- seurat_obj[,seurat_obj$sample %in% c('D7_kinchen','D14')]
+#keep only D7, Regeneration
+seurat_obj<- seurat_obj[,seurat_obj$sample %in% c('InflammationK','Regeneration')]
 
 # convert seurat object to SingleCellExperiment
 df.sce <- as.SingleCellExperiment(seurat_obj)
-df.sce$celltypes_timepoint <- factor(df.sce$celltypes_timepoint, levels =c('D7_kinchen_Trophocytes','D7_kinchen_PDGFRalo','D7_kinchen_Telocytes','D14_Trophocytes','D14_PDGFRalo','D14_Telocytes'))
+df.sce$celltypes_condition <- factor(df.sce$celltypes_condition, levels =c('InflammationK_Trophocytes','InflammationK_CD81-stroma','InflammationK_SEMFs','Regeneration_Trophocytes','Regeneration_CD81-stroma','Regeneration_SEMFs'))
 
 
 #-------------------plot the mean expression across celltypes 
 pdf('fig5_b_TF_expression.pdf',width = 4, height = 4)
 plotGroupedHeatmap(df.sce,exprs_values='logcounts', features=c('Nfkb1','Bach1','Smad3','Ets2','Ets1','Nfe2l2','Fosl1','Cebpb','Fosl2','Nfia','Nfib','Egr3','Tcf7l2','Pbx1'),center=T, scale = F,
-                   group=c('celltypes_timepoint'), zlim = c(-0.5,0.5), show_rownames=T,display_numbers = F, cluster_cols=F,cluster_rows=T, cutree_rows = 1)# + theme(text = element_text(size=20),axis.text  = element_text(size=40))
+                   group=c('celltypes_condition'), zlim = c(-0.5,0.5), show_rownames=T,display_numbers = F, cluster_cols=F,cluster_rows=T, cutree_rows = 1)# + theme(text = element_text(size=20),axis.text  = element_text(size=40))
 #keep the above as a variable to extract the clusters 
 dev.off()
 
@@ -42,7 +42,7 @@ dev.off()
 # circos plot with TFs and target genes based on scenicplus 
 
 # Load regulon data, find in zenodo
-regulons_df<-read.table('/SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
+regulons_df<-read.table('./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
 
 
 # Define genes and TFs
@@ -229,7 +229,7 @@ dev.off()
 all_atac_genes<-getFeatures(proj_fib)
 
 # load regulons
-regulons_df<-read.table('/SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
+regulons_df<-read.table('./SCENICPLUS_D0_D7_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
 
 regulons_df %>% group_by(TF) %>%
   top_n(n = -200, wt = triplet_rank) -> regulons_df_top100

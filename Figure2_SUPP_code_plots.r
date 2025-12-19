@@ -9,14 +9,14 @@ library(SCpubr)
 # set working directory 
 setwd('/your home/')
 
-# loading the scRNA-seq object with the Harmony integration of D0, D7, D14 all stromal cells // not included in processed files
+# loading the scRNA-seq object with the Harmony integration of Healthy, D7, D14 all stromal cells // not included in processed files
 seurat_obj<-readRDS(file = "seurat5_Harmony_integration_all_samples_treated_together_D7_D14.rds")
 
 unique(seurat_obj$celltypes_origIdent)
 
 # colours  
-colours_conditions = c('D0'='#569B9A','D0_kinchen'="#A1CEC5",'D7_kinchen'='#8e0f62','D14'='#CD5808')
-colours_celltypes = c('Trophocytes'="#8E7692",'PDGFRalo'='#a5af37','Telocytes'='#416522','SMCs'='gold','BECs'='firebrick','LECs'='mediumorchid4','Pericytes'='darkorange3','Proliferating'='turquoise4')
+colours_conditions = c('Healthy'='#569B9A','HealthyK'="#A1CEC5",'InflammationK'='#8e0f62','Regeneration'='#CD5808')
+colours_celltypes = c('Trophocytes'="#8E7692",'CD81-stroma'='#a5af37','SEMFs'='#416522','SMCs'='gold','BECs'='firebrick','LECs'='mediumorchid4','Pericytes'='darkorange3','Proliferating'='turquoise4')
 
 #------------------ Fig2.a supp
 pdf('Fig2_a_SUPP_Quality_control_metrics.pdf', width =9, height = 7)

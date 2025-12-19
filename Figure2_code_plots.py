@@ -16,8 +16,8 @@ from plotnine import theme, element_text
 # download processed files form zenodo: Processed_datasets_for_scRNA_scATAC_scenicplus
 # -------------------- loading the scplusmdata.h5mu SCENIC+ main output 
 #--------------------- and the filtered direct regulons that we used in our analysis 
-scplus_mdata = mudata.read("./SCENICPLUS_D0_D7_D14_regulons_results/scplusmdata.h5mu")
-filt_regulons=pd.read_csv('./SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv',index_col=0 , sep='\t')
+scplus_mdata = mudata.read("./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/scplusmdata.h5mu")
+filt_regulons=pd.read_csv('./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv',index_col=0 , sep='\t')
 filt_regulons=filt_regulons['Gene_signature_name'].unique()
 
 len(filt_regulons) # this should be 43 
@@ -28,6 +28,18 @@ scplus_mdata_tmp.uns['direct_e_regulon_metadata']=scplus_mdata_tmp.uns['direct_e
 
 # make variable with celltype and timepoint from indices of metacells 
 scplus_mdata_tmp.obs['Celltype_Timepoint']=scplus_mdata_tmp.obs.index.str.replace(r'.(\d*$)','').copy()
+
+#change names 
+scplus_mdata_tmp.obs['Celltype_Timepoint'] = (
+    scplus_mdata_tmp.obs['Celltype_Timepoint']
+    .astype(str)
+    .str.replace('D0', 'Healthy', regex=False)
+    .str.replace('D7', 'Inflammation', regex=False)
+    .str.replace('D14', 'Regeneration', regex=False)
+    .str.replace('Telocytes', 'SEMFs', regex=False)
+    .str.replace('PDGFRalo', 'CD81-stroma', regex=False)
+    .astype('category')
+)
 
 #figure 2.g ----- scenicplus plot
 # ------------------------- heatmap 
@@ -44,11 +56,11 @@ p=heatmap_dotplot(
     orientation = "vertical",
     scale_size_matrix=True,
     scale_color_matrix=True,
-    group_variable_order = ['D0_Trophocytes','D0_PDGFRalo','D0_Telocytes','D7_Trophocytes','D7_PDGFRalo','D7_Telocytes','D14_Trophocytes','D14_PDGFRalo','D14_Telocytes'],
+    group_variable_order = ['Healthy_Trophocytes','Healthy_CD81-stroma','Healthy_SEMFs','Inflammation_Trophocytes','Inflammation_CD81-stroma','Inflammation_SEMFs','Regeneration_Trophocytes','Regeneration_CD81-stroma','Regeneration_SEMFs'],
     figsize = (6, 10), 
     save=None,   # don’t save yet, adjust first
 )
 
 p = p + theme(axis_text_x=element_text(rotation=45, ha='right'))
-p.save("/Fig2_g_Heatmap_scenicplus_results.pdf")
+p.save("./Fig2_g_Heatmap_scenicplus_results.pdf")
 

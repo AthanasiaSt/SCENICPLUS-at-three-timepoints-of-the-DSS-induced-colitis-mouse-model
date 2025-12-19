@@ -19,12 +19,12 @@ library(dplyr)
 var<-getwd() 
 setwd(paste0(var,'/Processed_datasets_for_scRNA_scATAC_scenicplus/'))
 
-# loading the scRNA-seq object with the Harmony integration of D0, D7, D14 fibroblasts
-seurat_obj<-readRDS(file = "/scRNA_seurat_integration_D0_D7_D14/Seurat5_Harmony_integration_all_samples_D0_D7_D14_fibroblasts.rds")
+# loading the scRNA-seq object with the Harmony integration of Healthy, InflammationK, Regeneration fibroblasts
+seurat_obj<-readRDS(file = "./scRNA_seurat_integration_Healthy_Inflammation_Regeneration/Seurat5_Harmony_integration_all_samples_Healthy_Inflammation_Regeneration_fibroblasts.rds")
 
 # colours  
-colours_conditions = c('D0'='#569B9A','D0_kinchen'="#A1CEC5",'D7_kinchen'='#8e0f62','D14'='#CD5808')
-colours_celltypes = c('Trophocytes'="#8E7692",'PDGFRalo'='#a5af37','Telocytes'='#416522')
+colours_conditions = c('Healthy'='#569B9A','HealthyK'="#A1CEC5",'InflammationK'='#8e0f62','Regeneration'='#CD5808')
+colours_celltypes = c('Trophocytes'="#8E7692",'CD81-stroma'='#a5af37','SEMFs'='#416522')
 
 #-----------------------------Figure 1.b
 pdf('Fig1_b_UMAP_celltypes_fibroblasts.pdf', width = 5, height = 5)
@@ -37,18 +37,22 @@ SCpubr::do_DimPlot(sample = seurat_obj, pt.size = 0.4, group.by = 'sample', colo
 dev.off()
 
 #-----------------------------Figure 1.d
-genes<-c("Bmp5","Sox6", "Pdgfra",'Col14a1',"Col15a1", 'Fgfr2', "Edil3","C3","Cd81", "Pi16")
+genes<-c("Bmp5","Sox6", "Pdgfra","Col15a1", 'Fgfr2', "Edil3",'Col14a1',"C3","Cd81", "Pi16")
+seurat_obj$celltypes <- factor(seurat_obj$celltypes, levels = c('SEMFs','CD81-stroma','Trophocytes'))
 
 pdf('Fig1_dMarkers_celltypes_dotplot.pdf', width = 7, height = 3)
 
 SCpubr::do_DotPlot(sample = seurat_obj, 
-                   features = genes, 
+                   features = rev(genes), 
                    cluster = F,
                    dot.scale = 8, group.by = 'celltypes', font.size = 10)
 
 dev.off()
 
 #-----------------------------Figure 1.e
+seurat_obj$celltypes <- factor(seurat_obj$celltypes, levels = c('Trophocytes','CD81-stroma','SEMFs'))
+seurat_obj$sample <- factor(seurat_obj$sample, levels = c('Healthy','Regeneration','HealthyK','InflammationK'))
+
 df<-as.data.frame(table(seurat_obj$sample,seurat_obj$celltypes)/rowSums(table(seurat_obj$sample,seurat_obj$celltypes)))
 
 pdf('Fig1_e_Percentage_celltypes.pdf', width=2, height = 0.8)
@@ -71,30 +75,31 @@ dev.off()
 # upregulated
 functional_terms_up<-  read_excel('Supplementary Data 1.xlsx', sheet = 'ORA_upDEGs_top_results')
 common_up <- unique(unlist(strsplit(functional_terms_up[functional_terms_up$category == 'common_up_functions',]$geneID,"/")))
-d14_up <- unique(unlist(strsplit(functional_terms_up[functional_terms_up$category == 'D14_up_functions',]$geneID,"/")))
-d7_up <- unique(unlist(strsplit(functional_terms_up[functional_terms_up$category == 'D7_up_functions',]$geneID,"/")))
+Regeneration_up <- unique(unlist(strsplit(functional_terms_up[functional_terms_up$category == 'Regeneration_up_functions',]$geneID,"/")))
+InflammationK_up <- unique(unlist(strsplit(functional_terms_up[functional_terms_up$category == 'Inflammation(K)_up_functions',]$geneID,"/")))
 
 #downregulated
-d7_down<-  read_excel('Supplementary Data 1.xlsx', sheet = 'ORA_downDEGs_top_results')
-d7_down <- unique(unlist(strsplit(d7_down$geneID,"/")))
+InflammationK_down<-  read_excel('Supplementary Data 1.xlsx', sheet = 'ORA_downDEGs_top_results')
+InflammationK_down <- unique(unlist(strsplit(InflammationK_down$geneID,"/")))
 
 # extract all the genes corresponding to the functional terms and
 #calculate average log2 fold change for each gene, in each cell type and condition against the corresponding control
 temp<-c()
 temp1<-c()
 
-for (cluster in c('Trophocytes','PDGFRalo','Telocytes')) {
-  fold_ch_D14<-FoldChange(seurat_obj, group.by = 'celltypes_timepoint',features =unique(c(d7_up, common_up, d14_up,d7_down)) , ident.1 = paste0('D14_',cluster),ident.2 =  paste0('D0_',cluster))
-  temp[[paste0('D14_',cluster)]] <- fold_ch_D14$avg_log2FC
+for (cluster in c('Trophocytes','CD81-stroma','SEMFs')) {
+  fold_ch_Regeneration<-FoldChange(seurat_obj, group.by = 'celltypes_condition',features =unique(c(InflammationK_up, common_up, Regeneration_up,InflammationK_down)) , ident.1 = paste0('Regeneration_',cluster),ident.2 =  paste0('Healthy_',cluster))
+  temp[[paste0('Regeneration_',cluster)]] <- fold_ch_Regeneration$avg_log2FC
   
-  fold_ch_D7<-FoldChange(seurat_obj, group.by = 'celltypes_timepoint',features = unique(c(d7_up, common_up, d14_up,d7_down)), ident.1 =  paste0('D7_kinchen_',cluster),ident.2 = paste0('D0_kinchen_',cluster))
-  temp1[[paste0('D7_kinchen_',cluster)]] <- fold_ch_D7$avg_log2FC
+  fold_ch_InflammationK<-FoldChange(seurat_obj, group.by = 'celltypes_condition',features = unique(c(InflammationK_up, common_up, Regeneration_up,InflammationK_down)), ident.1 =  paste0('InflammationK_',cluster),ident.2 = paste0('HealthyK_',cluster))
+  temp1[[paste0('InflammationK_',cluster)]] <- fold_ch_InflammationK$avg_log2FC
   
 }
 
+
 # put the results in a dataframe
 df <- cbind(as.data.frame(temp1), as.data.frame(temp)) 
-rownames(df) <-unique(c(d7_up, common_up, d14_up,d7_down))
+rownames(df) <-unique(c(InflammationK_up, common_up, Regeneration_up,InflammationK_down))
 df<-as.data.frame(df)
 df <- as.matrix(df)
 
@@ -108,18 +113,18 @@ quantile_breaks <- function(xs, n = 500) {
 mat_breaks <- quantile_breaks(df, n = 500)
 
 # Make a single hetmap for each gene_set corresponding to up/down regulated functions
-genes_to_plot <- list(d7_up,common_up, d14_up, d7_down)
-names_in_titles <- list('D7_up_regulated_genes','Commonly_up_regulated_genes','D14_up_regulated_genes', 'D7_down_regulated_genes')
+genes_to_plot <- list(InflammationK_up,common_up, Regeneration_up, InflammationK_down)
+names_in_titles <- list('InflammationK_up_regulated_genes','Commonly_up_regulated_genes','Regeneration_up_regulated_genes', 'InflammationK_down_regulated_genes')
 
 for (i in 1:4){
   
 # multiple levels of annotation on the heatmap / condition X celltype
-mat_col_g_c <- data.frame(group = c('D7','D7','D7','D14','D14','D14'), celltype= c('Trophocytes','PDGFRalo','Telocytes','Trophocytes','PDGFRalo','Telocytes'))
+mat_col_g_c <- data.frame(group = c('InflammationK','InflammationK','InflammationK','Regeneration','Regeneration','Regeneration'), celltype= c('Trophocytes','CD81-stroma','SEMFs','Trophocytes','CD81-stroma','SEMFs'))
 rownames(mat_col_g_c) <- colnames(df[genes_to_plot[[i]],])
 
 mat_colors_g_c <- list(group = c('#8e0f62','#CD5808'), celltype = c('#8E7692','#a5af37','#416522'))
-names(mat_colors_g_c$group) <- c('D7','D14')
-names(mat_colors_g_c$celltype) <- c('Trophocytes','PDGFRalo','Telocytes')
+names(mat_colors_g_c$group) <- c('InflammationK','Regeneration')
+names(mat_colors_g_c$celltype) <- c('Trophocytes','CD81-stroma','SEMFs')
 
 pdf(paste0(names_in_titles[[i]],'_Fig1_f_heatmap.pdf'), width = 3, height = 4)
 (

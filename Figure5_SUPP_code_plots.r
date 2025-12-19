@@ -14,25 +14,25 @@ setwd('/yout pathway/')
 # --------------------- Load other D0 Mouse datasets -- not included in Zenodo processed data
 #Fazilaty et al
 df <- readRDS(file = "/home/astavropoulou/D0_D7_D14_PAPER_FINAL_FILES_RUNS/Fleming_PC/D0_Fazilaty.rds")
-df$celltypes <- factor(df$celltypes, levels = c('Trophocytes','PDGFRalo','Telocytes'))
+df$celltypes <- factor(df$celltypes, levels = c('Trophocytes','CD81-stroma','SEMFs'))
 df.sce_faz <- as.SingleCellExperiment(df)
 
 #Ho et al
 df <- readRDS(file = "/home/astavropoulou/D0_D7_D14_PAPER_FINAL_FILES_RUNS/Fleming_PC/D0_H0_et_al.rds")
-df$celltypes <- factor(df$celltypes, levels = c('Trophocytes','PDGFRalo','Telocytes'))
+df$celltypes <- factor(df$celltypes, levels = c('Trophocytes','CD81-stroma','SEMFs'))
 df.sce_ho <- as.SingleCellExperiment(df)
 
 #Ho et al
 df <- readRDS(file = "/home/astavropoulou/D0_D7_D14_PAPER_FINAL_FILES_RUNS/Fleming_PC/H20_chr_DSS.rds")
-df$celltypes <- factor(df$celltypes, levels = c('Trophocytes','PDGFRalo','Telocytes'))
+df$celltypes <- factor(df$celltypes, levels = c('Trophocytes','CD81-stroma','SEMFs'))
 df.sce_Jasso <- as.SingleCellExperiment(df)
 
 
 #Load our integrated datase for D0 kinchen and in house D0 
 seurat_obj<-readRDS(file = "/home/astavropoulou/seurat5_Harmony_integration_all_samples_treated_together_D7_D14_Subclustering.rds")
-df.sce_in_house <- as.SingleCellExperiment(seurat_obj[,seurat_obj$orig.ident %in% c('D0')])
+df.sce_in_house <- as.SingleCellExperiment(seurat_obj[,seurat_obj$orig.ident %in% c('Healthy')])
 df.sce_in_house$celltypes<- df.sce_in_house$celltypes_origIdent_older
-df.sce_kinchen <- as.SingleCellExperiment(seurat_obj[,seurat_obj$orig.ident %in% c('D0_kinchen')])
+df.sce_kinchen <- as.SingleCellExperiment(seurat_obj[,seurat_obj$orig.ident %in% c('HealthyK')])
 df.sce_kinchen$celltypes<- df.sce_kinchen$celltypes_origIdent_older
 
 #-------------------plot the mean of groups across cells 
@@ -82,7 +82,7 @@ dev.off()
 
 #Load our integrated dataset -- find in zenodo processed files 
 seurat_obj<-readRDS(file = "/scRNA_seurat_integration_D0_D7_D14/Seurat5_Harmony_integration_all_samples_D0_D7_D14_fibroblasts.rds")
-df.sce <- as.SingleCellExperiment(seurat_obj[,seurat_obj$orig.ident %in% c('D14','D7_kinchen')])
+df.sce <- as.SingleCellExperiment(seurat_obj[,seurat_obj$orig.ident %in% c('Regeneration','InflammationK')])
 df.sce$celltypes<- df.sce$celltypes_origIdent_older
 
 

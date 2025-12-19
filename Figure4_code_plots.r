@@ -2,6 +2,7 @@
 
 library(monocle3)
 library(Seurat)
+library(ggplot2)
 
 # Download processed data from Zenodo: Processed_datasets_for_scRNA_scATAC_scenicplus 
 
@@ -9,12 +10,12 @@ library(Seurat)
 var<-getwd() 
 setwd(paste0(var,'/Processed_datasets_for_scRNA_scATAC_scenicplus/'))
 
-# loading the scRNA-seq object with the Harmony integration of D0, D7, D14 fibroblasts
-seurat_obj<-readRDS(file = "/scRNA_seurat_integration_D0_D7_D14/Seurat5_Harmony_integration_all_samples_D0_D7_D14_fibroblasts.rds")
+# loading the scRNA-seq object with the Harmony integration of Healthy, D7, Regeneration fibroblasts
+seurat_obj<-readRDS(file = "./scRNA_seurat_integration_Healthy_Inflammation_Regeneration/Seurat5_Harmony_integration_all_samples_Healthy_Inflammation_Regeneration_fibroblasts.rds")
 
 # colours  
-colours_conditions = c('D0'='#569B9A','D0_kinchen'="#A1CEC5",'D7_kinchen'='#8e0f62','D14'='#CD5808')
-colours_celltypes = c('Trophocytes'="#8E7692",'PDGFRalo'='#a5af37','Telocytes'='#416522')
+colours_conditions = c('Healthy'='#569B9A','HealthyK'="#A1CEC5",'InflammationK'='#8e0f62','Regeneration'='#CD5808')
+colours_celltypes = c('Trophocytes'="#8E7692",'CD81-stroma'='#a5af37','SEMFs'='#416522')
 
 #------------Figure 4.a 
 # insert raw data into a monocle object  
@@ -44,8 +45,8 @@ monocle_object <- reduce_dimension(monocle_object)
 monocle_object <- cluster_cells(cds = monocle_object)
 monocle_object <- learn_graph(monocle_object, use_partition = TRUE)
 
-# a helper function to identify the root principal points: from D0
-get_earliest_principal_node <- function(monocle_object, time_bin="D0"){
+# a helper function to identify the root principal points: from Healthy
+get_earliest_principal_node <- function(monocle_object, time_bin="Healthy"){
   cell_ids <- which(colData(monocle_object)[, "sample"] == time_bin)
   
   closest_vertex <-
@@ -86,11 +87,11 @@ plot_cells(monocle_object,
 
 dev.off()
 
-#-------------------------------------- Figure 4.j
+#-------------------------------------- Figure 4.g
 
-pdf('Fig4_j_Pi16_grem1_D0_D0kinchen_blended_featureplot.pdf', width = 15, height = 4)
+pdf('Fig4_g_Pi16_grem1_Healthy_Healthykinchen_blended_featureplot.pdf', width = 15, height = 4)
 FeaturePlot(
-  seurat_obj[,seurat_obj$sample %in% c('D0','D0_kinchen')],
+  seurat_obj[,seurat_obj$sample %in% c('Healthy','HealthyK')],
   features = c("Pi16", "Grem1"),
   blend = TRUE, order = TRUE, 
   blend.threshold = 0.3, reduction = 'umap',

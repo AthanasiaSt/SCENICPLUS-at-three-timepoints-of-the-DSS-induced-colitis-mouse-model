@@ -15,8 +15,8 @@ proj_fib<-loadArchRProject('3_Save-Allcells_initial_analysis_3')
 
 
 #----------- Make plots with specific colours ------------   
-colours_conditions = c('cnt'='#569B9A','D7'='#8e0f62','D14'='#CD5808')
-colours_celltypes = c('Trophocytes'="#8E7692",'PDGFRalo'='#a5af37','Telocytes'='#416522','SMCs'='gold','BECs'='firebrick','LECs'='mediumorchid4','Pericytes'='darkorange3','Glial'='slateblue3')
+colours_conditions = c('Healthy'='#569B9A','INflammation'='#8e0f62','Regeneration'='#CD5808')
+colours_celltypes = c('Trophocytes'="#8E7692",'CD81-stroma'='#a5af37','SEMFs'='#416522','SMCs'='gold','BECs'='firebrick','LECs'='mediumorchid4','Pericytes'='darkorange3','Glial'='slateblue3')
 
 p1<-plotEmbedding(ArchRProj = proj_fib, baseSize = 0, size = 0.7, labelSize=0, colorBy = "cellColData", name = "Sample", embedding = "UMAP_unintegrated", pal = colours_conditions) +theme(axis.line =  element_blank(), panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.border = element_blank(), panel.background = element_blank()) 
 p2<-plotEmbedding(ArchRProj = proj_fib, baseSize = 0, size = 1, labelSize=0, colorBy = "cellColData", name = "all_celltypes", embedding = "UMAP_unintegrated", pal=colours_celltypes) + theme(axis.line =  element_blank(), panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.border = element_blank(), panel.background = element_blank())
@@ -41,8 +41,8 @@ features <- list(
   LECs = c('Lyve1','Prox1','Kdr'),
   Glial = c('S100b','Plp1','Gfap'),
   Trophocytes = c('Pi16','C3','Cd81'),
-  Telocytes = c('Pdgfra','Sox6','Bmp5','F3'),
-  PDGFRalo = c('Edil3','Fgfr2','Col15a1')
+  SEMFs = c('Pdgfra','Sox6','Bmp5','F3'),
+  CD81_stroma = c('Edil3','Fgfr2','Col15a1')
 )
 
 proj_fib <- addModuleScore(proj_fib,
@@ -73,12 +73,12 @@ p4 <- plotEmbedding(proj_fib,
 p5 <- plotEmbedding(proj_fib,
                     embedding = "UMAP_unintegrated",
                     colorBy = "cellColData",
-                    name="Module.Telocytes",
+                    name="Module.SEMFs",
                     imputeWeights = getImputeWeights(proj_fib),plotAs='points', size=2)
 p6 <- plotEmbedding(proj_fib,
                     embedding = "UMAP_unintegrated",
                     colorBy = "cellColData",
-                    name="Module.PDGFRalo",
+                    name="Module.CD81_stroma",
                     imputeWeights = getImputeWeights(proj_fib),plotAs='points', size=2)
 p7 <- plotEmbedding(proj_fib,
                     embedding = "UMAP_unintegrated",

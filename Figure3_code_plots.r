@@ -18,17 +18,18 @@ library(pheatmap)
 var<-getwd() 
 setwd(paste0(var,'/Processed_datasets_for_scRNA_scATAC_scenicplus/'))
 
-# loading the scRNA-seq object with the Harmony integration of D0, D7, D14 fibroblasts
-seurat_obj<-readRDS(file = "/scRNA_seurat_integration_D0_D7_D14/Seurat5_Harmony_integration_all_samples_D0_D7_D14_fibroblasts.rds")
+# loading the scRNA-seq object with the Harmony integration of Healthy, D7, Regeneration fibroblasts
+seurat_obj<-readRDS(file = "./scRNA_seurat_integration_Healthy_Inflammation_Regeneration/Seurat5_Harmony_integration_all_samples_Healthy_Inflammation_Regeneration_fibroblasts.rds")
 
 # colours  
-colours_conditions = c('D0'='#569B9A','D0_kinchen'="#A1CEC5",'D7_kinchen'='#8e0f62','D14'='#CD5808')
-colours_celltypes = c('Trophocytes'="#8E7692",'PDGFRalo'='#a5af37','Telocytes'='#416522')
+colours_conditions = c('Healthy'='#569B9A','HealthyK'="#A1CEC5",'InflammationK'='#8e0f62','Regeneration'='#CD5808')
+colours_celltypes = c('Trophocytes'="#8E7692",'CD81-stroma'='#a5af37','SEMFs'='#416522')
 
 
 #-----------------------------Figure 3.b
-#keep only D0 
-seurat_obj<- seurat_obj[,seurat_obj$sample == 'D0']
+#keep only Healthy 
+seurat_obj<- seurat_obj[,seurat_obj$sample == 'Healthy']
+seurat_obj$celltypes <- factor(seurat_obj$celltypes, levels = c('Trophocytes','CD81-stroma','SEMFs'))
 
 # convert seurat object to SingleCellExperiment as input to scater
 df.sce <- as.SingleCellExperiment(seurat_obj)
@@ -36,7 +37,7 @@ df.sce <- as.SingleCellExperiment(seurat_obj)
 order_genes<-c('Ar',"Ebf1" ,"Klf4",'Klf2',"Pbx1",'Egr1','Maf','Tcf21', 'Pitx1', 'Tcf4',"Etv1","Foxf2","Foxf1","Runx1","Runx2")
 #-------------------plot the mean expression across celltypes 
 
-pdf('Fig3_b_D0_Tfs_gene_expression.pdf',width = 2, height = 4)
+pdf('Fig3_b_Healthy_Tfs_gene_expression.pdf',width = 2, height = 4)
 
 plotGroupedHeatmap(df.sce,exprs_values='logcounts', features=order_genes,center=T, scale = F,
                    group=c('celltypes'), zlim = c(-0.5,0.5), show_rownames=T,display_numbers = F, cluster_cols=F,cluster_rows=F, cutree_rows = 1)# + theme(text = element_text(size=20),axis.text  = element_text(size=40))
@@ -47,10 +48,10 @@ dev.off()
 
 #--------------------------- UCell Signatures 
 #reload dataset
-seurat_obj<-readRDS(file = "/scRNA_seurat_integration_D0_D7_D14/Seurat5_Harmony_integration_all_samples_D0_D7_D14_fibroblasts.rds")
+seurat_obj<-readRDS(file = "./scRNA_seurat_integration_Healthy_Inflammation_Regeneration/Seurat5_Harmony_integration_all_samples_Healthy_Inflammation_Regeneration_fibroblasts.rds")
 
 #filtered regulons, can be found in zenodo
-regulons_df<-read.table('/SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
+regulons_df<-read.table('./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
 
 #keep the top 100 genes based on triplet ranking per regulon
 regulons_df %>% group_by(TF) %>%
@@ -59,28 +60,28 @@ regulons_df %>% group_by(TF) %>%
 signatures<-list()
 
 # make the signatures per FB subtype, based on the union of the top 100 genes per regulon
-signatures$Telocytes<- unique(regulons_df_top100[regulons_df_top100$TF %in% c('Runx1','Runx2','Foxf1','Foxf2','Tcf4','Etv1'),]$Gene)
-signatures$PDGFRalo<- unique(regulons_df_top100[regulons_df_top100$TF %in% c('Tcf21'),]$Gene)
+signatures$SEMFs<- unique(regulons_df_top100[regulons_df_top100$TF %in% c('Runx1','Runx2','Foxf1','Foxf2','Tcf4','Etv1'),]$Gene)
+signatures$CD81_stroma<- unique(regulons_df_top100[regulons_df_top100$TF %in% c('Tcf21'),]$Gene)
 signatures$Trophocytes<- unique(regulons_df_top100[regulons_df_top100$TF %in% c('Klf4','Klf2','Ebf1','Egr1','Ar','Pbx1'),]$Gene)
 
 seurat_obj <- AddModuleScore_UCell(seurat_obj,  features = signatures)
 
 pdf('Fig3_c_Homeostasis_TFs_top100_triplet_signatures.pdf', width = 3, height = 3)
 VlnPlot(seurat_obj, features = 'Trophocytes_UCell', group.by = 'celltypes', cols =colours_celltypes,  ncol = 1, pt.size = 0, combine = T)
-VlnPlot(seurat_obj, features = 'PDGFRalo_UCell', group.by = 'celltypes', cols =colours_celltypes,  ncol = 1, pt.size = 0, combine = T)
-VlnPlot(seurat_obj, features = 'Telocytes_UCell', group.by = 'celltypes', cols =colours_celltypes,  ncol = 1, pt.size = 0, combine = T)
+VlnPlot(seurat_obj, features = 'CD81_stroma_UCell', group.by = 'celltypes', cols =colours_celltypes,  ncol = 1, pt.size = 0, combine = T)
+VlnPlot(seurat_obj, features = 'SEMFs_UCell', group.by = 'celltypes', cols =colours_celltypes,  ncol = 1, pt.size = 0, combine = T)
 dev.off()
 
 
 pdf('Fig3_c_Homeostasis_split_dataset_TFs_top100_triplet_.pdf', width = 3, height = 3)
-VlnPlot(seurat_obj[,seurat_obj$sample %in% c('D0_kinchen','D7_kinchen')], features = 'Trophocytes_UCell',split.by = 'sample', group.by = 'celltypes', cols  = c('D0_kinchen'="#A1CEC5",'D7_kinchen'='#8e0f62'), ncol = 1, pt.size = 0, combine = T)
-VlnPlot(seurat_obj[,seurat_obj$sample %in% c('D0','D14')], features = 'Trophocytes_UCell',split.by = 'sample', group.by = 'celltypes', cols  = c('D0'='#569B9A','D14'='#CD5808'), ncol = 1, pt.size = 0, combine = T)
+VlnPlot(seurat_obj[,seurat_obj$sample %in% c('HealthyK','InflammationK')], features = 'Trophocytes_UCell',split.by = 'sample', group.by = 'celltypes', cols  = c('HealthyK'="#A1CEC5",'InflammationK'='#8e0f62'), ncol = 1, pt.size = 0, combine = T)
+VlnPlot(seurat_obj[,seurat_obj$sample %in% c('Healthy','Regeneration')], features = 'Trophocytes_UCell',split.by = 'sample', group.by = 'celltypes', cols  = c('Healthy'='#569B9A','Regeneration'='#CD5808'), ncol = 1, pt.size = 0, combine = T)
 
-VlnPlot(seurat_obj[,seurat_obj$sample %in% c('D0_kinchen','D7_kinchen')], features = 'PDGFRalo_UCell',split.by = 'sample', group.by = 'celltypes', cols  = c('D0_kinchen'="#A1CEC5",'D7_kinchen'='#8e0f62'), ncol = 1, pt.size = 0, combine = T)
-VlnPlot(seurat_obj[,seurat_obj$sample %in% c('D0','D14')], features = 'PDGFRalo_UCell',split.by = 'sample', group.by = 'celltypes', cols  = c('D0'='#569B9A','D14'='#CD5808'), ncol = 1, pt.size = 0, combine = T)
+VlnPlot(seurat_obj[,seurat_obj$sample %in% c('HealthyK','InflammationK')], features = 'CD81_stroma_UCell',split.by = 'sample', group.by = 'celltypes', cols  = c('HealthyK'="#A1CEC5",'InflammationK'='#8e0f62'), ncol = 1, pt.size = 0, combine = T)
+VlnPlot(seurat_obj[,seurat_obj$sample %in% c('Healthy','Regeneration')], features = 'CD81_stroma_UCell',split.by = 'sample', group.by = 'celltypes', cols  = c('Healthy'='#569B9A','Regeneration'='#CD5808'), ncol = 1, pt.size = 0, combine = T)
 
-VlnPlot(seurat_obj[,seurat_obj$sample %in% c('D0_kinchen','D7_kinchen')], features = 'Telocytes_UCell',split.by = 'sample', group.by = 'celltypes', cols  = c('D0_kinchen'="#A1CEC5",'D7_kinchen'='#8e0f62'), ncol = 1, pt.size = 0, combine = T)
-VlnPlot(seurat_obj[,seurat_obj$sample %in% c('D0','D14')], features = 'Telocytes_UCell',split.by = 'sample', group.by = 'celltypes', cols  = c('D0'='#569B9A','D14'='#CD5808'), ncol = 1, pt.size = 0, combine = T)
+VlnPlot(seurat_obj[,seurat_obj$sample %in% c('HealthyK','InflammationK')], features = 'SEMFs_UCell',split.by = 'sample', group.by = 'celltypes', cols  = c('HealthyK'="#A1CEC5",'InflammationK'='#8e0f62'), ncol = 1, pt.size = 0, combine = T)
+VlnPlot(seurat_obj[,seurat_obj$sample %in% c('Healthy','Regeneration')], features = 'SEMFs_UCell',split.by = 'sample', group.by = 'celltypes', cols  = c('Healthy'='#569B9A','Regeneration'='#CD5808'), ncol = 1, pt.size = 0, combine = T)
 
 dev.off()
 
@@ -90,7 +91,7 @@ dev.off()
 
 # Load regulon data -- from zenodo
 regulons_df <- read.table(
-  '/SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv',
+  './SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv',
   row.names = 1, sep = '\t', header = TRUE
 )
 
@@ -193,11 +194,11 @@ addArchRGenome("mm10")
 addArchRThreads(threads = 48) 
 
 #load ArchR project. Find in zenodo:........
-proj_fib<-loadArchRProject('Final_ArchR_object')
+proj_fib<-loadArchRProject('./Final_ArchR_object')
 all_atac_genes<-getFeatures(proj_fib)
 
 # load regulons found in zenodo
-regulons_df<-read.table('/SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
+regulons_df<-read.table('./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
 
 regulons_df %>% group_by(TF) %>%
   top_n(n = -100, wt = triplet_rank) -> regulons_df_top100
@@ -205,13 +206,13 @@ regulons_df %>% group_by(TF) %>%
 
 signatures<-list()
 
-signatures$Telocytes<- unique(regulons_df_top100[regulons_df_top100$TF %in% c('Runx1','Runx2','Foxf1','Foxf2','Tcf4','Etv1'),]$Gene)
-signatures$PDGFRalo<- unique(regulons_df_top100[regulons_df_top100$TF %in% c('Tcf21'),]$Gene)
+signatures$SEMFs<- unique(regulons_df_top100[regulons_df_top100$TF %in% c('Runx1','Runx2','Foxf1','Foxf2','Tcf4','Etv1'),]$Gene)
+signatures$CD81_stroma<- unique(regulons_df_top100[regulons_df_top100$TF %in% c('Tcf21'),]$Gene)
 signatures$Trophocytes<- unique(regulons_df_top100[regulons_df_top100$TF %in% c('Klf4','Klf2','Ebf1','Egr1','Ar','Pbx1'),]$Gene)
 
 #keep genes that are included in ArchR object 
-signatures$Telocytes<- signatures$Telocytes[signatures$Telocytes %in% all_atac_genes]
-signatures$PDGFRalo<- signatures$PDGFRalo[signatures$PDGFRalo %in% all_atac_genes]
+signatures$SEMFs<- signatures$SEMFs[signatures$SEMFs %in% all_atac_genes]
+signatures$CD81_stroma<- signatures$CD81_stroma[signatures$CD81_stroma %in% all_atac_genes]
 signatures$Trophocytes<- signatures$Trophocytes[signatures$Trophocytes %in% all_atac_genes]
 
 # -------- module score --
@@ -225,14 +226,14 @@ proj_fib <- addModuleScore(proj_fib,
 
 
 # we change the order , so that order is changed in the plot as well. 
-proj_fib$new_celltype_timepoint <- paste0(proj_fib$celltype,'_',proj_fib$Sample)
+proj_fib$new_celltype_timepoint <- paste0(proj_fib$celltype,'_',proj_fib$samples)
 
 
 p <- plotGroups(
   ArchRProj = proj_fib, 
   groupBy = "new_celltype_timepoint", 
   colorBy = "cellColData", 
-  name = "Module.Telocytes",
+  name = "Module.SEMFs",
   plotAs = "violin",
   alpha = 0.4,
   baseSize = 10,
@@ -254,7 +255,7 @@ p3 <- plotGroups(
   ArchRProj = proj_fib, 
   groupBy = "new_celltype_timepoint", 
   colorBy = "cellColData", 
-  name = "Module.PDGFRalo",
+  name = "Module.CD81_stroma",
   plotAs = "violin",
   alpha = 0.4,
   baseSize = 10,
@@ -365,7 +366,7 @@ seurat_obj_pelka$dataset<- c('pelka')
 #Qi
 seurat_obj <- readRDS('./public_data/Human_CRC/Qi_2022_CRC/Stromal/seurat_Qi_stromal_QC.rds')
 seurat_obj<- seurat_obj[,seurat_obj$Tissues == 'N']
-seurat_obj_qi<- seurat_obj[,seurat_obj$`Cell Types` %in% c('CD24+ fibroblasts','CD73+ fibroblasts','DES+ myofibroblasts','FGFR2+ fibroblasts','FAP+ fibroblasts','MFAP5+ myofibroblasts','ICAM1- telocytes','ICAM1+ telocytes')]
+seurat_obj_qi<- seurat_obj[,seurat_obj$`Cell Types` %in% c('CD24+ fibroblasts','CD73+ fibroblasts','DES+ myofibroblasts','FGFR2+ fibroblasts','FAP+ fibroblasts','MFAP5+ myofibroblasts','ICAM1- SEMFs','ICAM1+ SEMFs')]
 seurat_obj_qi$celltypes<- seurat_obj_qi$`Cell Types`
 seurat_obj_qi$dataset<- c('Qi')
 
@@ -383,7 +384,7 @@ seurat_obj <- RunPCA(seurat_obj, npcs = 40)
 
 #make the order 
 seurat_obj$celltypes_dataset <- paste0(seurat_obj$celltypes,'_', seurat_obj$dataset)
-seurat_obj$celltypes_dataset <- factor(seurat_obj$celltypes_dataset, levels = c('cS21 (Fibro stem cell niche)_pelka','cS22 (Fibro stem cell niche)_pelka','CD73+ fibroblasts_Qi','S3_kinchen','Stromal 3_Lee','cS23 (Fibro BMP-producing)_pelka','cS24 (Fibro BMP-producing)_pelka','S2_kinchen','Stromal 2_Lee','ICAM1+ telocytes_Qi','ICAM1- telocytes_Qi','FGFR2+ fibroblasts_Qi','cS25 (Fibro CCL8+)_pelka','CD24+ fibroblasts_Qi','Myofibroblasts_Lee','DES+ myofibroblasts_Qi','MFAP5+ myofibroblasts_Qi','FAP+ fibroblasts_Qi','S1_kinchen','Stromal 1_Lee','S4_kinchen'))
+seurat_obj$celltypes_dataset <- factor(seurat_obj$celltypes_dataset, levels = c('cS21 (Fibro stem cell niche)_pelka','cS22 (Fibro stem cell niche)_pelka','CD73+ fibroblasts_Qi','S3_kinchen','Stromal 3_Lee','cS23 (Fibro BMP-producing)_pelka','cS24 (Fibro BMP-producing)_pelka','S2_kinchen','Stromal 2_Lee','ICAM1+ SEMFs_Qi','ICAM1- SEMFs_Qi','FGFR2+ fibroblasts_Qi','cS25 (Fibro CCL8+)_pelka','CD24+ fibroblasts_Qi','Myofibroblasts_Lee','DES+ myofibroblasts_Qi','MFAP5+ myofibroblasts_Qi','FAP+ fibroblasts_Qi','S1_kinchen','Stromal 1_Lee','S4_kinchen'))
 Idents(seurat_obj) <- seurat_obj$celltypes_dataset
 
 # compute FB subtype signatures in human clusters to match our celltype annotation , based on mouse genes
@@ -391,8 +392,8 @@ human <- useEnsembl("ensembl","hsapiens_gene_ensembl", mirror = "useast")
 
 signatures<- list()
 signatures$Trophocytes<-unique(getBM(c("hgnc_symbol"), "external_gene_name",values =  c('Grem1','Pi16','Dpt','C3','Pcolce2') , human)$hgnc_symbol)
-signatures$Telocytes<- unique(getBM(c("hgnc_symbol"), "external_gene_name",values = c('Pdgfra','Sox6','Bmp5','Bmp7','Wnt5a','F3'), human)$hgnc_symbol)
-signatures$PDGFRalo<- unique(getBM(c("hgnc_symbol"), "external_gene_name",values = c('Adamdec1','Tcf21','Fgfr2','Col15a1','Edil3'), human)$hgnc_symbol)
+signatures$SEMFs<- unique(getBM(c("hgnc_symbol"), "external_gene_name",values = c('Pdgfra','Sox6','Bmp5','Bmp7','Wnt5a','F3'), human)$hgnc_symbol)
+signatures$CD81_stroma<- unique(getBM(c("hgnc_symbol"), "external_gene_name",values = c('Adamdec1','Tcf21','Fgfr2','Col15a1','Edil3'), human)$hgnc_symbol)
 
 sample.combined <- AddModuleScore_UCell(seurat_obj,  features = signatures)
 signature.names <- paste0(names(signatures), "_UCell")
@@ -438,7 +439,7 @@ dev.off()
 
 # compute regulon signatures in human clusters
 #regulons , find in zenodo
-regulons_df<-read.table('/SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
+regulons_df<-read.table('./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
 
 regulons_df %>% group_by(TF) %>%
   top_n(n = -100, wt = triplet_rank) -> regulons_df_top100

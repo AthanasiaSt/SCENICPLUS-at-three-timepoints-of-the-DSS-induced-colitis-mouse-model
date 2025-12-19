@@ -8,6 +8,7 @@ library(BSgenome.Mmusculus.UCSC.mm10)
 library(ggraph)
 library(grid)
 library(igraph)
+library(stringr)
 
 # Download processed data from Zenodo: Processed_datasets_for_scRNA_scATAC_scenicplus 
 
@@ -20,16 +21,18 @@ addArchRGenome("mm10")
 addArchRThreads(threads = 48) 
 
 #load ArchR project
-proj_fib<-loadArchRProject('Final_ArchR_object')
+proj_fib<-loadArchRProject('./Final_ArchR_object/')
+
 
 # colours 
-colours_conditions = c('cnt'='#569B9A','D7'='#8e0f62','D14'='#CD5808')
-colours_celltypes = c('Trophocytes'="#8E7692",'PDGFRalo'='#a5af37','Telocytes'='#416522')
+colours_conditions = c('Healthy'='#569B9A','Inflammation'='#8e0f62','Regeneration'='#CD5808')
+colours_celltypes = c('Trophocytes'="#8E7692",'CD81-stroma'='#a5af37','SEMFs'='#416522')
+
 
 #figure2.a,d,e
 p1 <- plotEmbedding(ArchRProj = proj_fib,baseSize = 0, size = 0.7, labelSize=0, colorBy = "cellColData", name = "Clusters_unintegrated", embedding = "UMAP_unintegrated")+theme(axis.line =  element_blank(), panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.border = element_blank(), panel.background = element_blank()) 
 p2<-plotEmbedding(ArchRProj = proj_fib, baseSize = 0, size = 1, labelSize=0, colorBy = "cellColData", name = "celltype", embedding = "UMAP_unintegrated", pal=colours_celltypes) + theme(axis.line =  element_blank(), panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.border = element_blank(), panel.background = element_blank())
-p3<-plotEmbedding(ArchRProj = proj_fib, baseSize = 0, size = 0.7, labelSize=0, colorBy = "cellColData", name = "Sample", embedding = "UMAP_unintegrated", pal = colours_conditions) +theme(axis.line =  element_blank(), panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.border = element_blank(), panel.background = element_blank()) 
+p3<-plotEmbedding(ArchRProj = proj_fib, baseSize = 0, size = 0.7, labelSize=0, colorBy = "cellColData", name = "samples", embedding = "UMAP_unintegrated", pal = colours_conditions) +theme(axis.line =  element_blank(), panel.grid.major = element_blank(),panel.grid.minor = element_blank(),panel.border = element_blank(), panel.background = element_blank()) 
 
 pdf('Fig2_a_d_e_ArchR_UMAPs.pdf', width = 5, height = 5)
 p1
@@ -42,8 +45,8 @@ proj_fib <- addImputeWeights(proj_fib)
 
 features <- list(
   Trophocytes = c('Pi16','C3','Cd81','Ebf1','Ar', 'Klf4', 'Egr1'),
-  PDGFRalo = c('Tcf21', 'Edil3', 'Fgfr2', 'Col15a1'),
-  Telocytes = c('Pdgfra', 'Sox6', 'Bmp5', 'Tcf4', 'Foxf2', 'Runx1', 'Runx2','F3')
+  CD81_stroma = c('Tcf21', 'Edil3', 'Fgfr2', 'Col15a1'),
+  SEMFs = c('Pdgfra', 'Sox6', 'Bmp5', 'Tcf4', 'Foxf2', 'Runx1', 'Runx2','F3')
 )
 
 #add module scores based on gene scores 
@@ -62,13 +65,13 @@ p1 <- plotEmbedding(proj_fib,
 p2 <- plotEmbedding(proj_fib,
                     embedding = "UMAP_unintegrated",
                     colorBy = "cellColData",
-                    name="Module.PDGFRalo",
+                    name="Module.CD81_stroma",
                     imputeWeights = getImputeWeights(proj_fib),plotAs='points', size=2)
 
 p3 <- plotEmbedding(proj_fib,
                     embedding = "UMAP_unintegrated",
                     colorBy = "cellColData",
-                    name="Module.Telocytes",
+                    name="Module.SEMFs",
                     imputeWeights = getImputeWeights(proj_fib),plotAs='points', size=2)
 
 pdf('Fig2_b_ArchR_modules_FB_subtypes.pdf', width = 5, height = 5)
@@ -83,7 +86,7 @@ dev.off()
 # load peaks from PeakCalls output in ArchR folder corresponding to initial clustering
 # List only .rds files starting with "C"
 peak_files <- list.files(
-  "~/Final_ArchR_object/PeakCalls/",
+  "./Final_ArchR_object/PeakCalls/",
   pattern = "^C.*\\.rds$",     # ^C means "starts with C"
   full.names = TRUE
 )
@@ -139,7 +142,7 @@ markersPeaks <- getMarkerFeatures(
 
 #make the heatmap with specific order of categories
 heatmapPeaks <- plotMarkerHeatmap(
-  seMarker = markersPeaks[,c('cnt_Trophocytes','D7_Trophocytes','D14_Trophocytes','cnt_PDGFRalo','D7_PDGFRalo','D14_PDGFRalo','cnt_Telocytes','D7_Telocytes','D14_Telocytes')], 
+  seMarker = markersPeaks[,c('Healthy_Trophocytes','Inflammation_Trophocytes','Regeneration_Trophocytes','Healthy_CD81-stroma','Inflammation_CD81-stroma','Regeneration_CD81-stroma','Healthy_SEMFs','Inflammation_SEMFs','Regeneration_SEMFs')], 
   cutOff = "FDR <= 0.01 & Log2FC >= 1",
   transpose = T,
   nLabel = 4,
@@ -156,7 +159,7 @@ dev.off()
 
 #Compute motif enrichments in the marker peaks 
 motifsUp <- peakAnnoEnrichment(
-  seMarker = markersPeaks[,c('cnt_Trophocytes','D7_Trophocytes','D14_Trophocytes','cnt_PDGFRalo','D7_PDGFRalo','D14_PDGFRalo','cnt_Telocytes','D7_Telocytes','D14_Telocytes')],
+  seMarker = markersPeaks[,c('Healthy_Trophocytes','Inflammation_Trophocytes','Regeneration_Trophocytes','Healthy_CD81-stroma','Inflammation_CD81-stroma','Regeneration_CD81-stroma','Healthy_SEMFs','Inflammation_SEMFs','Regeneration_SEMFs')],
   ArchRProj = proj_fib,
   peakAnnotation = "Motif",
   cutOff = "FDR <= 0.01 & Log2FC >= 1"
@@ -176,7 +179,7 @@ dev.off()
 # network of TF regulons regulating other TFs 
 
 # load filtered regulons -- from zenodo processed files 
-regulons_df<-read.table('/SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
+regulons_df<-read.table('./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
 
 # keep gene targets that are themselves TFs
 regulons_df<-regulons_df[regulons_df$Gene %in% unique(regulons_df$TF),]
@@ -185,14 +188,14 @@ regulons_df<-regulons_df[regulons_df$Gene %in% unique(regulons_df$TF),]
 df<-unique(regulons_df[,c('TF','Gene')])
 
 #make a directed graph
-g1 <- graph_from_data_frame(d = df, vertices = unique(c(df$TF,df$Gene)), directed = T)
+g1 <- graph_from_data_frame(d = df, vertices = unique(c(df$TF,df$Gene)), directed = F)
 
 # compute a clustering for node colors
 g1_undir <- as.undirected(g1, mode = "collapse")  # merge parallel edges
-V(g1)$clu <- as.character(membership(cluster_louvain(g1_undir, resolution = 1)))
+V(g1)$clu <- as.character(membership(cluster_louvain(g1, resolution = 1)))
 
 # compute degree as node size
-V(g1)$size <- degree(g1)
+V(g1)$size <- igraph::degree(g1)
 
 got_palette <- c(
   '2' = '#8e0f62', '1' ='#CD5808', '3'='#416522')

@@ -17,8 +17,8 @@ import matplotlib.pyplot as plt
 
 # -------------------- loading the scplusmdata.h5mu SCENIC+ main output // download from zenodo 
 #--------------------- and the filtered direct regulons that we used in our analysis 
-scplus_mdata = mudata.read("./SCENICPLUS_D0_D7_D14_regulons_results/scplusmdata.h5mu")
-filt_regulons=pd.read_csv('./SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv',index_col=0 , sep='\t')
+scplus_mdata = mudata.read("./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/scplusmdata.h5mu")
+filt_regulons=pd.read_csv('./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv',index_col=0 , sep='\t')
 filt_regulons=filt_regulons['Gene_signature_name'].unique()
 
 # ----------------------- keep the filtered regulons
@@ -39,6 +39,18 @@ eRegulon_gene_AUC = eRegulon_gene_AUC[:, eRegulon_gene_AUC.var_names.isin(regs_t
 
 eRegulon_gene_AUC.obs = scplus_mdata_tmp.obs.loc[eRegulon_gene_AUC.obs_names]
 eRegulon_gene_AUC.obs['Celltype_Timepoint']=eRegulon_gene_AUC.obs.index.str.replace(r'.(\d*$)','').copy()
+
+#change names 
+scplus_mdata_tmp.obs['Celltype_Timepoint'] = (
+    scplus_mdata_tmp.obs['Celltype_Timepoint']
+    .astype(str)
+    .str.replace('D0', 'Healthy', regex=False)
+    .str.replace('D7', 'Inflammation', regex=False)
+    .str.replace('D14', 'Regeneration', regex=False)
+    .str.replace('Telocytes', 'SEMFs', regex=False)
+    .str.replace('PDGFRalo', 'CD81-stroma', regex=False)
+    .astype('category')
+)
 
 
 #--------------- Region based
@@ -84,7 +96,7 @@ sc.pl.umap(
 
 #------------------------------ Fig4.b SUPP 
 # --------------------------plot numbers of genes and enhancers per regulon after filtering
-regulons_df=pd.read_csv('./SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv',index_col=0 , sep='\t')
+regulons_df=pd.read_csv('./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv',index_col=0 , sep='\t')
 
 # number of genes and enhancers -- keep combinations once
 genes=regulons_df.groupby(['TF','Gene']).size().reset_index().rename(columns={0:'count'}).groupby('TF').size()

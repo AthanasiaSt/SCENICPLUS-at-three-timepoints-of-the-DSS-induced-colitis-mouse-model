@@ -14,10 +14,10 @@ var<-getwd()
 setwd(paste0(var,'/Processed_datasets_for_scRNA_scATAC_scenicplus/'))
 
 # loading the scRNA-seq object with the Harmony integration of D0, D7, D14 fibroblasts
-seurat_obj<-readRDS(file = "/scRNA_seurat_integration_D0_D7_D14/Seurat5_Harmony_integration_all_samples_D0_D7_D14_fibroblasts.rds")
+seurat_obj<-readRDS(file = "./scRNA_seurat_integration_Healthy_Inflammation_Regeneration/Seurat5_Harmony_integration_all_samples_Healthy_Inflammation_Regeneration_fibroblasts.rds")
 
 #regulons
-regulons_df<-read.table('/SCENICPLUS_D0_D7_D14_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
+regulons_df<-read.table('./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
 
 regulons_df %>% group_by(TF) %>%
   top_n(n = -200, wt = triplet_rank) -> regulons_df_top100
