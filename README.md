@@ -5,12 +5,12 @@ This repository contains the code used to create all the plots associated with o
 In-house raw data from this work are deposited in GEO with the following accession numbers: 
 
 **scRNA-seq**
-  - Control colon (D0): GSE296873
-  - Regenerating colon (D14): GSE304016
-  - Acute inflammation (D7k) and control (D0k), from *Kinchen et al.*: GSE114374
+  - Control colon: GSE296873
+  - Regenerating colon: GSE304016
+  - Acute inflammation and control colon, from *Kinchen et al.*: GSE114374
   
 **scATAC-seq**
-  - Homeostasis (D0), acute inflammation (D7), regeneration (D14): GSE304192
+  - Homeostasis, acute inflammation, regeneration: GSE304192
 
 
 Processed files are deposited in zenodo: **10.5281/zenodo.17258163**
