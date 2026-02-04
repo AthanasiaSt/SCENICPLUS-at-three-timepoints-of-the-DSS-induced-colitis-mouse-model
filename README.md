@@ -1,6 +1,5 @@
 ## Single-cell Gene Regulatory Network analysis with SCENIC+ at three timepoints of the DSS-induced colitis mouse model
-
-This repository contains the code used to create all the plots associated with our manuscript: **Distinct enhancer-driven transcriptional networks shape intestinal fibroblast identities and regeneration-associated activation** 
+This repository contains code for the analysis and data visualization associated with the manuscript: **Distinct enhancer-driven transcriptional networks shape intestinal fibroblast identities and regeneration-associated activation** 
 
 In-house raw data from this work are deposited in GEO with the following accession numbers: 
 
