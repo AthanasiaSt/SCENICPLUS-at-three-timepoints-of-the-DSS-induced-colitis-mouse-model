@@ -82,7 +82,7 @@ matrix[np.isnan(matrix)] = 0  # replace NaNs with 0
 # Reorder rows and columns manually 
 # -------------------------------------------------------------------------
 d = pd.DataFrame(matrix).reindex(
-    index=['Healthy_Trophocytes','Healthy_CD81-stroma','Healthy_SEMFs'], 
+    index=['Healthy_Trophocytes','Healthy_CD81- stroma','Healthy_SEMFs'], 
     columns=['Ar', 'Ebf1', 'Klf4', 'Klf2','Hoxb4', 'Ebf3', 'Egr1', 'Pbx1',
              'Nfix','Tcf7l2', 'Egr3', 'Maf', 'Tcf21', 'Frem1', 'Pitx1',
              'Stat5b', 'Foxf2', 'Tcf4', 'Runx1', 'Runx2', 'Batf','Foxf1','Etv1']
@@ -101,5 +101,5 @@ g = sns.clustermap(
 )
 
 # Save figure
-g.savefig('/Fig3_a_heatmap_enrichments_D0_FB_subtype_Tf_regulons.pdf')
+g.savefig('./Fig3_a_heatmap_enrichments_D0_FB_subtype_Tf_regulons.pdf')
 

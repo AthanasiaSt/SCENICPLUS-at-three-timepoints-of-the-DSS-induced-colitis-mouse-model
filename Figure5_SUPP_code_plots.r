@@ -10,30 +10,42 @@ setwd('/yout pathway/')
 
 # figure 5 SUPP a 
 # Heatmap with mean expression of TF genes across other mouse datases of healthy colon
+colours_celltypes = c('Trophocytes'="#8E7692",'CD81-stroma'='#a5af37','SEMFs'='#416522')
 
 # --------------------- Load other D0 Mouse datasets -- not included in Zenodo processed data
 #Fazilaty et al
 df <- readRDS(file = "/home/astavropoulou/D0_D7_D14_PAPER_FINAL_FILES_RUNS/Fleming_PC/D0_Fazilaty.rds")
+
+df$celltypes<- as.character(df$celltypes)
+df[[]] %>%
+  mutate(celltypes = case_when(
+    endsWith(celltypes, "rophocytes") ~ "Trophocytes",
+    endsWith(celltypes, "DGFRalo") ~ "CD81-stroma",
+    endsWith(celltypes, "elocytes") ~ "SEMFs"
+  )) -> df[[]]
+
 df$celltypes <- factor(df$celltypes, levels = c('Trophocytes','CD81-stroma','SEMFs'))
+df$sample <- 'Fazilaty'
 df.sce_faz <- as.SingleCellExperiment(df)
 
 #Ho et al
 df <- readRDS(file = "/home/astavropoulou/D0_D7_D14_PAPER_FINAL_FILES_RUNS/Fleming_PC/D0_H0_et_al.rds")
 df$celltypes <- factor(df$celltypes, levels = c('Trophocytes','CD81-stroma','SEMFs'))
+df$sample <- 'Ho'
 df.sce_ho <- as.SingleCellExperiment(df)
 
 #Ho et al
 df <- readRDS(file = "/home/astavropoulou/D0_D7_D14_PAPER_FINAL_FILES_RUNS/Fleming_PC/H20_chr_DSS.rds")
 df$celltypes <- factor(df$celltypes, levels = c('Trophocytes','CD81-stroma','SEMFs'))
+df$sample <- 'Jasso'
 df.sce_Jasso <- as.SingleCellExperiment(df)
 
 
 #Load our integrated datase for D0 kinchen and in house D0 
-seurat_obj<-readRDS(file = "/home/astavropoulou/seurat5_Harmony_integration_all_samples_treated_together_D7_D14_Subclustering.rds")
-df.sce_in_house <- as.SingleCellExperiment(seurat_obj[,seurat_obj$orig.ident %in% c('Healthy')])
-df.sce_in_house$celltypes<- df.sce_in_house$celltypes_origIdent_older
-df.sce_kinchen <- as.SingleCellExperiment(seurat_obj[,seurat_obj$orig.ident %in% c('HealthyK')])
-df.sce_kinchen$celltypes<- df.sce_kinchen$celltypes_origIdent_older
+seurat_obj<-readRDS(file = "./scRNA_seurat_integration_Healthy_Inflammation_Regeneration/Seurat5_Harmony_integration_all_samples_Healthy_Inflammation_Regeneration_fibroblasts.rds")
+seurat_obj$celltypes <- factor(seurat_obj$celltypes, levels = c('Trophocytes','CD81-stroma','SEMFs'))
+df.sce_in_house <- as.SingleCellExperiment(seurat_obj[,seurat_obj$sample %in% c('Healthy')])
+df.sce_kinchen <- as.SingleCellExperiment(seurat_obj[,seurat_obj$sample %in% c('HealthyK')])
 
 #-------------------plot the mean of groups across cells 
 
@@ -74,8 +86,49 @@ for (name in names(datasets)) {
   
   print(p)  # <-- ensure it renders into the PDF
 }
+dev.off()
+# Open one PDF
+pdf("Percentage_celltypes_D0_datasets.pdf", width = 4, height = 1.5)
 
+# Loop and plot
+for (name in names(datasets)) {
+  df.sce <- datasets[[name]]
+  df<-as.data.frame(table(df.sce$sample,df.sce$celltypes)/rowSums(table(df.sce$sample,df.sce$celltypes)))
+  
+  p <- ggplot(df,                  # Stacked barplot using ggplot2
+              aes(x = Freq,
+                  y = Var1,
+                  fill = Var2)) + 
+    labs( 
+      y="samples", x='percentage')+
+    
+    geom_bar(stat = "identity")+  scale_fill_manual(values = colours_celltypes)  + theme(text = element_text(size=3),axis.text  = element_text(size=3)) 
+  
+  print(p)  # <-- ensure it renders into the PDF
+}
 # Close device
+dev.off()
+
+# Combine all datasets first
+df_all <- do.call(rbind, lapply(names(datasets), function(name) {
+  df.sce <- datasets[[name]]
+  tab <- table(df.sce$sample, df.sce$celltypes)
+  prop <- prop.table(tab, margin = 1)  # percentages per sample
+  
+  df <- as.data.frame(prop)
+  colnames(df) <- c("sample", "celltype", "percentage")
+  df$dataset <- name
+  df
+}))
+
+pdf("Percentage_celltypes_D0_datasets.pdf", width = 4, height = 4)
+ggplot(df_all,
+            aes(x = percentage,
+                y = sample,
+                fill = celltype)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = colours_celltypes) +
+  labs(x = "Percentage", y = "Sample")
 dev.off()
 
 #Figure 5 SUPP b. 

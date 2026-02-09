@@ -19,9 +19,6 @@ seurat_obj<-readRDS(file = "./scRNA_seurat_integration_Healthy_Inflammation_Rege
 #regulons
 regulons_df<-read.table('./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
 
-regulons_df %>% group_by(TF) %>%
-  top_n(n = -200, wt = triplet_rank) -> regulons_df_top100
-
 signatures<-list()
 
 # find overlaps of regulons 

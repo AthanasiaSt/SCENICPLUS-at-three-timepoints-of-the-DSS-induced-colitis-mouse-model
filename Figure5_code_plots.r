@@ -32,7 +32,7 @@ df.sce$celltypes_condition <- factor(df.sce$celltypes_condition, levels =c('Infl
 
 
 #-------------------plot the mean expression across celltypes 
-pdf('fig5_b_TF_expression.pdf',width = 4, height = 4)
+pdf('fig5_b_TF_expression.pdf',width =3, height = 4)
 plotGroupedHeatmap(df.sce,exprs_values='logcounts', features=c('Nfkb1','Bach1','Smad3','Ets2','Ets1','Nfe2l2','Fosl1','Cebpb','Fosl2','Nfia','Nfib','Egr3','Tcf7l2','Pbx1'),center=T, scale = F,
                    group=c('celltypes_condition'), zlim = c(-0.5,0.5), show_rownames=T,display_numbers = F, cluster_cols=F,cluster_rows=T, cutree_rows = 1)# + theme(text = element_text(size=20),axis.text  = element_text(size=40))
 #keep the above as a variable to extract the clusters 
@@ -187,7 +187,7 @@ addArchRGenome("mm10")
 addArchRThreads(threads = 48) 
 
 #load ArchR project. Find in zenodo
-proj_fib<-loadArchRProject('Final_ArchR_object')
+proj_fib<-loadArchRProject('./Final_ArchR_object')
 proj_fib <- addImputeWeights(proj_fib)
 
 #-- ChromVAr--- deviation scores 
@@ -229,7 +229,7 @@ dev.off()
 all_atac_genes<-getFeatures(proj_fib)
 
 # load regulons
-regulons_df<-read.table('./SCENICPLUS_D0_D7_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
+regulons_df<-read.table('./SCENICPLUS_Healthy_Inflammation_Regeneration_regulons_results/Direct_Positive_eRegulons_filtered_basedOn_GeneBased_AUC.csv', row.names = 1, sep='\t', header = T)
 
 regulons_df %>% group_by(TF) %>%
   top_n(n = -200, wt = triplet_rank) -> regulons_df_top100
@@ -249,8 +249,8 @@ proj_fib <- addImputeWeights(proj_fib)
 proj_fib <- addModuleScore(proj_fib,
                            useMatrix = "GeneScoreMatrix",
                            name = "Module",
-                           features = signatures,
-                           imputeWeights = getImputeWeights(proj_fib))
+                           features = signatures
+                           )
 
 
 # we change the order , so that order is changed in the plot as well. 

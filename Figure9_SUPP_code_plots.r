@@ -32,7 +32,7 @@ seurat_obj <- AddModuleScore_UCell(seurat_obj,  features = signatures, maxRank =
 signature.names <- paste0(names(signatures), "_UCell")
 
 #Figure 9 SUPP a.
-pdf('Activation_regulons_top200_triplet_signature_V2.pdf', width = 6, height = 4)
+pdf('fig9_supp_a_Activation_regulons_top200_triplet_signature.pdf', width = 6, height = 4)
 VlnPlot(seurat_obj, features = 'inflammation_UCell', group.by = 'celltypes_condition', cols = alpha(c('red2','blue3','forestgreen','red2','blue3','forestgreen','magenta4','orange','yellow','steelblue2','palevioletred','peachpuff2'), 0.6),  ncol = 1, pt.size = 0, combine = T)
 VlnPlot(seurat_obj, features = 'regeneration_UCell', group.by = 'celltypes_condition', cols = alpha(c('red2','blue3','forestgreen','red2','blue3','forestgreen','magenta4','orange','yellow','steelblue2','palevioletred','peachpuff2'), 0.6),  ncol = 1, pt.size = 0, combine = T)
 dev.off()
@@ -75,8 +75,9 @@ dev.off()
 
 colours_celltypes = c('Trophocytes'="#9E7692",'PDGFRalo'='#a5af37','Telocytes'='#416522')
 
-#marker genes based on gene scores -- output from ArchR can be dowloaded as supplementary table from the manuscript
+#marker genes based on gene scores -- output from ArchR can be dowloaded as supplementary table from the manuscript (supplementary table 4)
 markers_atac<-read.table('Markers_celltype_Stim_padj_0_05_genescorematrix.csv', header = T)
+
 
 genes<- c('Nfia','Nfib')
 
@@ -90,15 +91,15 @@ for (gene in genes) {
   df2 <- tmp %>%
     mutate(
       # split "cnt_PDGFRalo" etc. into two parts
-      timepoint = str_extract(group_name, "cnt|D7|D14"),
-      celltype  = str_remove(group_name, "cnt_|D7_|D14_")
+      timepoint = str_extract(group_name, "Healthy|Inflammation|Regeneration"),
+      celltype  = str_remove(group_name, "Healthy_|Inflammation_|Regeneration_")
     )
   
   # order timepoints
-  df2$timepoint <- factor(df2$timepoint, levels = c("cnt", "D7", "D14"))
+  df2$timepoint <- factor(df2$timepoint, levels = c("Healthy", "Inflammation", "Regeneration"))
   
   # order celltypes if you want a consistent order
-  df2$celltype <- factor(df2$celltype, levels = c('Trophocytes',"PDGFRalo", "Telocytes"))
+  df2$celltype <- factor(df2$celltype, levels = c('Trophocytes',"CD81- stroma", "SEMFs"))
   df2$FDR <- as.numeric(df2$FDR)
   df2 <- df2 %>%
     mutate(
@@ -119,7 +120,7 @@ for (gene in genes) {
     geom_text(aes(y = y_pos, label = sig),
               position = position_dodge2(width = 0.9, preserve = "single"),
               size = 6)+
-    scale_fill_manual(values = c('Trophocytes'="#9E7692",'PDGFRalo'='#a5af37','Telocytes'='#416522')) +
+    scale_fill_manual(values = c('Trophocytes'="#9E7692",'CD81- stroma'='#a5af37','SEMFs'='#416522')) +
     theme_minimal(base_size = 16) +
     theme(
       axis.text.x = element_text(size = 14),

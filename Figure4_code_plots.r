@@ -39,6 +39,8 @@ cds <- new_cell_data_set(expression_matrix,
 
 
 #monocle preprocessing
+#monocle_object <- as.cell_data_set(seurat_obj) # used the same Harmony embedding as Fig1. (run also cluster_cells and learn_graph)
+
 monocle_object <- preprocess_cds(cds, num_dim = 40)
 monocle_object <- align_cds(monocle_object, alignment_group = "dataset", residual_model_formula_str = '~ percent.mt')
 monocle_object <- reduce_dimension(monocle_object)
@@ -62,6 +64,9 @@ monocle_object <- order_cells(monocle_object, root_pr_nodes=get_earliest_princip
 
 #this is needed for plotting genes on the umaps
 rowData( monocle_object ) <- data.frame( 'gene_short_name'=rownames(monocle_object) )
+
+#load the monocle object that we have saved during our analysis // this object is not provided. 
+#monocle_object <- load_monocle_objects('/home/astavropoulou/D0_D7_D14_PAPER_FINAL_FILES_RUNS/analysis_and_plots/8_Trajectory_and_diff_potency/Monocle/monocle_objects/Allcells_monocle_batchcorrected')
 
 #------------ UMAPs  
 pdf('Fig4_a_Monocle_umaps.pdf', width = 6, height = 6)

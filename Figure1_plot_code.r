@@ -14,6 +14,7 @@ library(patchwork)
 library(dplyr)
 
 # Download processed data from Zenodo: Processed_datasets_for_scRNA_scATAC_scenicplus 
+setwd('D0_D7_D14_PAPER_FINAL_FILES_RUNS')
 
 # set working directory
 var<-getwd() 
@@ -73,13 +74,13 @@ dev.off()
 # loading common and condition-specific up/down-regulated enriched functional terms, download Supplementary table 1 in the manuscript.
 
 # upregulated
-functional_terms_up<-  read_excel('Supplementary Data 1.xlsx', sheet = 'ORA_upDEGs_top_results')
+functional_terms_up<-  read_excel('Supplementary Data 1_new.xlsx', sheet = 'ORA_upDEGs_top_results')
 common_up <- unique(unlist(strsplit(functional_terms_up[functional_terms_up$category == 'common_up_functions',]$geneID,"/")))
 Regeneration_up <- unique(unlist(strsplit(functional_terms_up[functional_terms_up$category == 'Regeneration_up_functions',]$geneID,"/")))
 InflammationK_up <- unique(unlist(strsplit(functional_terms_up[functional_terms_up$category == 'Inflammation(K)_up_functions',]$geneID,"/")))
 
 #downregulated
-InflammationK_down<-  read_excel('Supplementary Data 1.xlsx', sheet = 'ORA_downDEGs_top_results')
+InflammationK_down<-  read_excel('Supplementary Data 1_new.xlsx', sheet = 'ORA_downDEGs_top_results')
 InflammationK_down <- unique(unlist(strsplit(InflammationK_down$geneID,"/")))
 
 # extract all the genes corresponding to the functional terms and
