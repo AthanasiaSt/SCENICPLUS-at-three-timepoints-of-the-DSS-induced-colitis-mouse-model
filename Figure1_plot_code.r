@@ -14,8 +14,6 @@ library(patchwork)
 library(dplyr)
 
 # Download processed data from Zenodo: Processed_datasets_for_scRNA_scATAC_scenicplus 
-setwd('D0_D7_D14_PAPER_FINAL_FILES_RUNS')
-
 # set working directory
 var<-getwd() 
 setwd(paste0(var,'/Processed_datasets_for_scRNA_scATAC_scenicplus/'))
